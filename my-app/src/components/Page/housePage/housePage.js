@@ -1,0 +1,56 @@
+import React from 'react';
+import ItemList from "../../itemList";
+import ItemDetails from "../../itemDetails";
+import ErrorMessage from '../../error/errorMessage';
+import GotService from '../../../services/gotServices';
+import { Field } from '../../itemDetails/itemDetails';
+import RowBlock from './../../rowBlock/rowBlock';
+
+export default class HousePage extends React.Component {
+    gotService = new GotService();
+
+    state = {
+        selectedHouse: null,
+        error: false
+    };
+
+    onItemSelected = (id) => {
+        this.setState({
+            selectedHouse: id
+        });
+    };
+
+    componentDidCatch() {
+        this.setState({
+            error: true
+        });
+    }
+
+    render() {
+        if (this.state.error) {
+            return <ErrorMessage/>;
+        }
+
+        const itemList = (
+            <ItemList
+                onItemSelected={this.onItemSelected}
+                getData={this.gotService.getAllHouses}
+                renderItem={({name}) => name}/>
+        );
+
+        const itemDetails = (
+            <ItemDetails
+            itemId={this.state.selectedHouse}
+            getData={this.gotService.getHouse} >
+                <Field field='region' label='Region'/>
+                <Field field='words' label='Words'/>
+                <Field field='titles' label='Titles'/>
+                <Field field='ancestralWeapons' label='Ancestral Weapons'/>
+            </ItemDetails>
+        );
+
+        return (
+           <RowBlock left={itemList} right={itemDetails} />
+        );
+    }
+}
